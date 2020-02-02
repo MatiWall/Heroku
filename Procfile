@@ -1,1 +1,1 @@
-web: dashboard:server 
+web: app:server 
