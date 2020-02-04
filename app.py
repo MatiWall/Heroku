@@ -25,7 +25,10 @@ server = app.server
 
 
 
-app.layout = html.Div([   
+app.layout = html.Div([
+	
+		html.H1('K&M Investments',  style={'text-align': 'center', 'color': 'white' , 'backgroundColor':'dodgerblue', 'fontSize' : 40, 'font-weight': 'bold', 'font-style': 'italic', 'marginBottom': 0, 'marginTop': 0, 'border-radius': 5,}) ,  
+
         html.Div(dcc.Input(id = 'Stock-Ticker', placeholder = 'Enter Stock Ticker', type = 'text', value = 'TSLA' ),),
         
         html.Div([
@@ -33,7 +36,7 @@ app.layout = html.Div([
         html.Div(dcc.Graph(id = 'Stock Chart Returns', figure = plots.plot_timeseries()), className = 'six columns'),
                 ], )
 
-        ])
+        ], )
 
 
 if __name__ == '__main__':
