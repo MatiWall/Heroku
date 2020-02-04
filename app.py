@@ -34,8 +34,14 @@ server = app.server
 
 app.layout = html.Div([   
         html.Div(dcc.Input(id = 'Stock-Ticker', placeholder = 'Enter Stock Ticker', type = 'text', value = 'TSLA' ),),
-        html.Div(dcc.Graph(id = 'Stock Chart', figure = fig),),
-                ], className = 'six columns')
+        
+        html.Div([
+        html.Div(dcc.Graph(id = 'Stock Chart Close', figure = fig), className = 'six columns'),
+        html.Div(dcc.Graph(id = 'Stock Chart Returns', figure = fig), className = 'six columns'),
+                ], )
+
+        ])
+
 
 if __name__ == '__main__':
     app.run_server(debug = True)
