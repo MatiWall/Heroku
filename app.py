@@ -35,7 +35,6 @@ app.layout = html.Div([
         html.Div(dcc.Graph(id = 'Stock Chart Close', figure = plots.plot_timeseries()), className = 'six columns'),
         html.Div(dcc.Graph(id = 'Stock Chart Returns', figure = plots.plot_timeseries()), className = 'six columns'),
                 ], )
-
         ], )
 
 
