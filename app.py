@@ -15,21 +15,27 @@ df = pdr.data.get_data_yahoo(ticker, start = start_date)
 
 
 df.reset_index(inplace = True)
-fig = go.Figure([go.Scatter(x = df['Date'], y = df['Close'])])
-
-layout = dict(title = 'Stoch chart', show_legend = False)
 
 
 
-app = dash.Dash()
+layout = dict(title = 'Stoch chart', showlegend = False)
+fig = go.Figure(go.Scatter(x = list(df['Date']), y = list(df['Close'])), layout)
+
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
 
 server = app.server
 
-app.layout = html.Div([
-        
-        html.H1(children = 'Hello World'),
-        html.H1(dcc.Graph(id = 'Stock Chart', figure = fig)),
-                ])
+
+
+app.layout = html.Div([   
+        html.Div(dcc.Input(id = 'Stock-Ticker', placeholder = 'Enter Stock Ticker', type = 'text', value = 'TSLA' ),),
+        html.Div(dcc.Graph(id = 'Stock Chart', figure = fig),),
+                ], className = 'six columns')
 
 if __name__ == '__main__':
     app.run_server(debug = True)
