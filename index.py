@@ -6,6 +6,8 @@ from dash.dependencies import Input, Output
 from app import app
 from apps import app1, app2
 
+from app import server # Necessary for heroku deployment
+
 
 header_style = {'text-align': 'center', 'color': 'white' , 'backgroundColor':'dodgerblue', 'fontSize' : 40, 'font-weight': 'bold', 'font-style': 'italic', 'marginBottom': 0, 'marginTop': 0, 'border-radius': 5,}
 
