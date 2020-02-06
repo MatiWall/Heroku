@@ -4,8 +4,19 @@ from dash.dependencies import Input, Output
 
 from app import app
 
+from .plots import timeseries_plot
+
+plot = timeseries_plot()
+
 layout = html.Div([
     html.H3('App 1'),
+        dcc.Input(
+            id="input-ticker",
+            type='text',
+            placeholder="Insert ticker",
+        )
+    
+    ,
     dcc.Dropdown(
         id='app-1-dropdown',
         options=[
@@ -14,6 +25,8 @@ layout = html.Div([
             ]
         ]
     ),
+    #plot.Date_range_slider(),
+    dcc.Graph( id = 'stock-plot' , figure = plot.plot()),
     html.Div(id='app-1-display-value'),
     dcc.Link('Go to App 2', href='/apps/app2')
 ])
@@ -24,3 +37,4 @@ layout = html.Div([
     [Input('app-1-dropdown', 'value')])
 def display_value(value):
     return 'You have selected "{}"'.format(value)
+
