@@ -6,35 +6,49 @@ from app import app
 
 from .plots import timeseries_plot
 
-plot = timeseries_plot()
+import pandas_datareader as pdr
+
+
+nasdaq_tickers = pdr.nasdaq_trader.get_nasdaq_symbols(retry_count=3, timeout=30, pause=None)
+
+names = nasdaq_tickers['Security Name']
+tickers = nasdaq_tickers['NASDAQ Symbol']
+options = [{'label' : name, 'value' : ticker } for (name, ticker) in zip(names.to_list(), tickers.to_list())]
+
+
+
 
 layout = html.Div([
-    html.H3('App 1'),
-        dcc.Input(
+    html.H3('Timeseries Analysis of Longterm Stocks'),
+        html.Div(dcc.Dropdown(
             id="input-ticker",
-            type='text',
-            placeholder="Insert ticker",
+            options = options,
+            placeholder="Select one or more companies",
+            multi = True,
+            value='TSLA'
         )
-    
+    )
     ,
-    dcc.Dropdown(
-        id='app-1-dropdown',
-        options=[
-            {'label': 'App 1 - {}'.format(i), 'value': i} for i in [
-                'NYC', 'MTL', 'LA'
-            ]
-        ]
-    ),
-    #plot.Date_range_slider(),
-    dcc.Graph( id = 'stock-plot' , figure = plot.plot()),
-    html.Div(id='app-1-display-value'),
+    html.Div(id = 'stock-plot'),
     dcc.Link('Go to App 2', href='/apps/app2')
 ])
 
 
-@app.callback(
-    Output('app-1-display-value', 'children'),
-    [Input('app-1-dropdown', 'value')])
+@app.callback(# Callback that loads chosen data
+    Output('stock-plot', 'children'),
+    [Input('input-ticker', 'value')])
 def display_value(value):
-    return 'You have selected "{}"'.format(value)
+    try:
+        if isinstance(value, str):
+            df = pdr.data.get_data_yahoo(value)
+            plot = timeseries_plot( df, 'test')
+        elif isinstance(value, list):
+            data_frames = [pdr.data.get_data_yahoo(val) for val in value]
+            plot = timeseries_plot(data_frames[0], 'test')
+    except:
+        plot = None 
+    
+    
+    print(value)
+    return  dcc.Graph( figure = plot.plot())
 

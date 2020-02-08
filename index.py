@@ -8,13 +8,19 @@ from apps import app1, app2
 from app import server # Necessary for heroku deployment
 
 
-logo_style = {'text-align': 'center', 'color': 'white' , 'backgroundColor':'dodgerblue', 'fontSize' : 40, 'font-weight': 'bold', 'font-style': 'italic', 'marginLeft': 20,}
+#import os
+#import psycopg2
 
+#DATABASE_URL = os.environ.get('DATABASE_URL')
+#print(DATABASE_URL)
+#conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
+
+
+
+logo_style = {'text-align': 'center', 'color': 'white' , 'backgroundColor':'dodgerblue', 'fontSize' : 40, 'font-weight': 'bold', 'font-style': 'italic', 'marginLeft': 20,}
 navigation_buttom_style ={'text-align': 'center', 'color': 'white', 'fontSize' : 20, 'marginBottom': 0, 'marginTop': 0, 'marginLeft': 5, 'marginRight': 5}
 navigation_style = {'backgroundColor':'dodgerblue', 'border-radius': 5 , 'marginLeft': 0,}
-
-
-
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),

@@ -1,16 +1,15 @@
 import plotly.graph_objects as go
-import pandas_datareader as pdr
 import pandas as pd
+import plotly.tools as tls
 
-import time
 import dash_core_components as dcc
 
 
 class timeseries_plot:
     
-    def __init__(self, ticker = 'TSLA', window = 50):
+    def __init__(self, df,  ticker = 'TSLA', window = 50):
         
-        self.df = pdr.data.get_data_yahoo(ticker)
+        self.df = df
         self.ticker = ticker
             
         self.rolling_mean = True
@@ -20,33 +19,24 @@ class timeseries_plot:
         self.end = None 
     
     def plot(self, price = 'Close', rolling_mean = True, **kwargs):
-        layout =  go.Layout( margin={'t': 30, 'b' : 5, 'r' : 5, 'l' : 5}, xaxis_title = 'Date', yaxis_title = price, title = self.ticker)
-    		
-        fig = go.Figure(go.Scatter(x = list(self.df.index), y = list(self.df[price])), {})
-        fig.layout = layout
+       
+     
+        fig = tls.make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.009,horizontal_spacing=0.009)
+        fig['layout']['margin'] = {'l': 30, 'r': 10, 'b': 50, 't': 25}
+ 
+        fig.append_trace({'x':self.df.index,'y':self.df[price],'type':'scatter','name':price},1,1)
+        fig.update_yaxes(title_text = 'Price', row=1, col=1)
+        
+        
+        fig.append_trace({'x':self.df.index,'y':self.df.Volume,'type':'bar','name':'Volume'},2,1)
+        fig.update_xaxes(title_text="Date", row=2, col=1)
+        fig.update_yaxes(title_text='Counts', row=2, col=1)
         
         if rolling_mean:
             df_rm = self.df.rolling(self.window, center = True).mean()
-            fig.add_trace(go.Scatter(x = df_rm.index, y = df_rm[price] ))
+            fig.add_trace({'x' : df_rm.index, 'y' : df_rm[price], 'name' : 'mavg'  }, 1,1)
         
         return fig
-
-    def Date_range_slider(self):
-        
-        date_range = self.df.index
-        nth = 100
-        
-        unixTimeMillis = lambda x : int(time.mktime(x.timetuple()))
-        unixToDatetime = lambda x : int(pd.to_datetime(x,unit='D'))
-        getmarks = {i : date for i, date in enumerate(date_range) if i%nth == 1}
-        
-        slider = dcc.RangeSlider(
-                id='year_slider',
-                min = int(unixTimeMillis(date_range.min())),
-                max = int(unixTimeMillis(date_range.max())),
-                value = [unixTimeMillis( date_range.min()) , unixTimeMillis( date_range.min() )],
-                marks=getmarks
-            )
-        print(time.localtime( unixToDatetime(slider.min)))
-        return slider
+    
+    
 
