@@ -29,14 +29,15 @@ layout = html.Div([
             multi = True,
             value='TSLA'
         ), 
-             dcc.RadioItems(
-             id='xaxis-type',
+             dcc.Checklist(
+             id='OHLC',
              options=[{'label': i, 'value': i} for i in ['Close', 'Open', 'High', 'Low', 'Adj Close']],
-             value='Close',
-             labelStyle={'display': 'inline-block'},  )  
+             labelStyle={'display': 'inline-block'},  
+             value = ['Close']
+             )  
 
 
-    ]),
+    ], className = 'six columns'), html.Br(), html.Br()
                     ]),
     html.Br(),     
     html.Div(id = 'stock-plot'),
@@ -46,20 +47,30 @@ layout = html.Div([
 
 @app.callback(# Callback that loads chosen data
     Output('stock-plot', 'children'),
-    [Input('input-ticker', 'value')])
-def display_value(value):
+    [Input('input-ticker', 'value'), Input('OHLC', 'value')])
+def display_value(values, OHLC):
+
     try:
-        if isinstance(value, str):
-            df = pdr.data.get_data_yahoo(value)
+        if isinstance(values, str):
+            df = pdr.data.get_data_yahoo(values)
             plot = timeseries_plot( df )
-        elif isinstance(value, list):
-            data_frames = [pdr.data.get_data_yahoo(val) for val in value]
+        elif isinstance(values, list):
+            data_frames = [pdr.data.get_data_yahoo(value) for value in values]
             plot = timeseries_plot(data_frames[0] )
-        figure = dcc.Graph( figure = plot.plot())
+            
+        
+        figure = plot.plot()
+        
+        figure = plot.add_plot(figure, OHLC)
+        
+        
+        
+        
+        figure = dcc.Graph( figure = figure)
+    
     except:
         figure = dcc.Graph()
     
     
-    print(value)
     return  figure
 
