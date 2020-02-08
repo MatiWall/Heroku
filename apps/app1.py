@@ -13,22 +13,32 @@ nasdaq_tickers = pdr.nasdaq_trader.get_nasdaq_symbols(retry_count=3, timeout=30,
 
 names = nasdaq_tickers['Security Name']
 tickers = nasdaq_tickers['NASDAQ Symbol']
-options = [{'label' : name, 'value' : ticker } for (name, ticker) in zip(names.to_list(), tickers.to_list())]
-
+options_ticker = [{'label' : name, 'value' : ticker } for (name, ticker) in zip(names.to_list(), tickers.to_list())]
+options_price = [{'label': 'Highest Daily Price', 'value': 'High'}, {'label': 'Lowest Daily Price', 'value': 'Low'}, 
+                 {'label': 'Open Price', 'value': 'Open'}, {'label': 'Close Price', 'value': 'Close'}, {'label': 'Adjusted Close Price', 'value': 'Adj Close'}]
 
 
 
 layout = html.Div([
     html.H3('Timeseries Analysis of Longterm Stocks'),
-        html.Div(dcc.Dropdown(
+    html.Div([
+    html.Div(dcc.Dropdown(
             id="input-ticker",
-            options = options,
+            options = options_ticker,
             placeholder="Select one or more companies",
             multi = True,
             value='TSLA'
+        ), className = 'five columns'
+    ),
+     html.Div(
+            dcc.Dropdown(
+                id='price-type',
+                options = options_price,
+                multi=True,
+            ), className ='five columns'
         )
-    )
-    ,
+                    ]),
+    html.Br(), html.Br(),     
     html.Div(id = 'stock-plot'),
     dcc.Link('Go to App 2', href='/apps/app2')
 ])
@@ -41,14 +51,15 @@ def display_value(value):
     try:
         if isinstance(value, str):
             df = pdr.data.get_data_yahoo(value)
-            plot = timeseries_plot( df, 'test')
+            plot = timeseries_plot( df )
         elif isinstance(value, list):
             data_frames = [pdr.data.get_data_yahoo(val) for val in value]
-            plot = timeseries_plot(data_frames[0], 'test')
+            plot = timeseries_plot(data_frames[0] )
+        figure = dcc.Graph( figure = plot.plot())
     except:
-        plot = None 
+        figure = dcc.Graph()
     
     
     print(value)
-    return  dcc.Graph( figure = plot.plot())
+    return  figure
 
