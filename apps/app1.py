@@ -22,23 +22,23 @@ options_price = [{'label': 'Highest Daily Price', 'value': 'High'}, {'label': 'L
 layout = html.Div([
     html.H3('Timeseries Analysis of Longterm Stocks'),
     html.Div([
-    html.Div(dcc.Dropdown(
+    html.Div([dcc.Dropdown(
             id="input-ticker",
             options = options_ticker,
             placeholder="Select one or more companies",
             multi = True,
             value='TSLA'
-        ), className = 'five columns'
-    ),
-     html.Div(
-            dcc.Dropdown(
-                id='price-type',
-                options = options_price,
-                multi=True,
-            ), className ='five columns'
-        )
+        ), 
+             dcc.RadioItems(
+             id='xaxis-type',
+             options=[{'label': i, 'value': i} for i in ['Close', 'Open', 'High', 'Low', 'Adj Close']],
+             value='Close',
+             labelStyle={'display': 'inline-block'},  )  
+
+
+    ]),
                     ]),
-    html.Br(), html.Br(),     
+    html.Br(),     
     html.Div(id = 'stock-plot'),
     dcc.Link('Go to App 2', href='/apps/app2')
 ])

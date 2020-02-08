@@ -6,6 +6,12 @@ import dash_core_components as dcc
 
 
 class timeseries_plot:
+    '''
+    docstring
+    
+    '''
+    
+    
     
     def __init__(self, df,  ticker = 'TSLA', window = 50):
         
@@ -39,4 +45,13 @@ class timeseries_plot:
         return fig
     
     
+    def candlestick(self):
+        
+        fig = go.Figure(data=[go.Candlestick(x=self.df.index,
+                open=self.df['Open'],
+                high=self.df['High'],
+                low=self.df['Low'],
+                close=self.df['Close'])])
+        fig.update_layout(xaxis_rangeslider_visible=False)
 
+        return fig
