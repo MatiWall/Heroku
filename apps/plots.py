@@ -32,11 +32,13 @@ class timeseries_plot:
         fig.update_yaxes(title_text = 'Price', row=1, col=1)
         
         
-        fig.append_trace({'x':self.df.index,'y':self.df.Volume,'type':'bar','name':'Volume'},2,1)
+        fig.append_trace({'x':self.df.index,'y':self.df.Volume,'type':'bar','name':'Volume', 'showlegend' : False, 'marker' :{'color' : 'red'}},2,1)
         fig.update_xaxes(title_text="Date", row=2, col=1)
         fig.update_yaxes(title_text='Counts', row=2, col=1)
         
         return fig
+    
+    
     
     def add_plot(self, fig, prices):
         
@@ -47,9 +49,15 @@ class timeseries_plot:
         
     
     
-    def running_mean(self, fig, price, window):
-        df_rm = self.df.rolling(self.window, center = True).mean()
+    def bollinger_bands(self, fig, price, window = 20, no_std = 2, center = False):
+        df_rm = self.df.rolling(self.window, center = center).mean()
+        rolling_std = self.df.rolling(window, center = center ).std()
+        
+        
         fig = fig.add_trace({'x' : df_rm.index, 'y' : df_rm[price], 'name' : 'mavg'  }, 1,1)
+        fig = fig.add_trace({'x' : df_rm.index, 'y' : df_rm[price]+rolling_std*no_std, 'name' : 'Bb Upper'  }, 1,1)
+        fig = fig.add_trace({'x' : df_rm.index, 'y' : df_rm[price]+rolling_std*no_std, 'name' : 'Bb Lower'  }, 1,1)
+        
         return fig
         
     
@@ -67,6 +75,11 @@ class timeseries_plot:
 
         return fig
     
+    
+    
+    
+    
+    
     @staticmethod
     def is_list( value ):
         if isinstance(value, list):
@@ -77,3 +90,6 @@ class timeseries_plot:
         return value
         
     
+    
+class data_storage():
+    pass

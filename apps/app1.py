@@ -22,7 +22,7 @@ options_price = [{'label': 'Highest Daily Price', 'value': 'High'}, {'label': 'L
 layout = html.Div([
     html.H3('Timeseries Analysis of Longterm Stocks'),
     html.Div([
-    html.Div([dcc.Dropdown(
+    html.Div(id = 'content', children = [dcc.Dropdown(
             id="input-ticker",
             options = options_ticker,
             placeholder="Select one or more companies",
@@ -39,8 +39,18 @@ layout = html.Div([
 
     ], className = 'six columns'), html.Br(), html.Br()
                     ]),
-    html.Br(),     
-    html.Div(id = 'stock-plot'),
+    html.Br(), html.Div([ 
+    html.Div(id = 'stock-plot', className = 'ten columns'),
+    html.Div([  html.H5('Technical Indocators'),
+    dcc.Checklist(
+             id='technical-indicators',
+             options=[{'label': i, 'value': i} for i in ['Bollinger Bands', 'Open', 'High', 'Low', 'Adj Close']],
+             value = ['Close'],
+             
+             ),
+            ])
+    
+    ])  ,
     dcc.Link('Go to App 2', href='/apps/app2')
 ])
 
