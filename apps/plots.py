@@ -42,7 +42,7 @@ class timeseries_plot:
     
     def add_plot(self, fig, prices):
         
-        for price in self.is_list(prices):
+        for price in is_list(prices):
             fig.append_trace({'x':self.df.index,'y':self.df[price],'type':'scatter','name': price},1,1)
         
         return fig
@@ -80,16 +80,14 @@ class timeseries_plot:
     
     
     
-    @staticmethod
-    def is_list( value ):
-        if isinstance(value, list):
-            pass
-        elif isinstance(value, str):
-            value = [value]
+
+def is_list( value ):
+    if isinstance(value, list):
+        pass
+    elif isinstance(value, str):
+        value = [value]
             
-        return value
+    return value
         
     
     
-class data_storage():
-    pass

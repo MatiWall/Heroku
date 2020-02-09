@@ -4,9 +4,10 @@ from dash.dependencies import Input, Output
 
 from app import app
 
-from .plots import timeseries_plot
+from .plots import timeseries_plot, is_list
 
 import pandas_datareader as pdr
+import pandas as pd
 
 
 nasdaq_tickers = pdr.nasdaq_trader.get_nasdaq_symbols(retry_count=3, timeout=30, pause=None)
@@ -20,7 +21,7 @@ options_price = [{'label': 'Highest Daily Price', 'value': 'High'}, {'label': 'L
 
 
 layout = html.Div([
-    html.H3('Timeseries Analysis of Longterm Stocks'),
+    html.H3('Long Term Stock Trading'),
     html.Div([
     html.Div(id = 'content', children = [dcc.Dropdown(
             id="input-ticker",
@@ -30,15 +31,15 @@ layout = html.Div([
             value='TSLA'
         ), 
              dcc.Checklist(
-             id='OHLC',
+             id='OCLH',
              options=[{'label': i, 'value': i} for i in ['Close', 'Open', 'High', 'Low', 'Adj Close']],
              labelStyle={'display': 'inline-block'},  
              value = ['Close']
              )  
-
-
     ], className = 'six columns'), html.Br(), html.Br()
                     ]),
+             html.Div(id='intermediate-data-value', style={'display': 'none'}),
+             
     html.Br(), html.Div([ 
     html.Div(id = 'stock-plot', className = 'ten columns'),
     html.Div([  html.H5('Technical Indocators'),
@@ -56,31 +57,31 @@ layout = html.Div([
 
 
 @app.callback(# Callback that loads chosen data
-    Output('stock-plot', 'children'),
-    [Input('input-ticker', 'value'), Input('OHLC', 'value')])
-def display_value(values, OHLC):
+    Output('intermediate-data-value', 'children'),
+    [Input('input-ticker', 'value')])
+def display_value(values):
+    df_data = pd.DataFrame()
+    for value in is_list(values):
+        df = pdr.data.get_data_yahoo(value)
+        df[value] = value
+        df_data = df_data.append(df)
+    
+    return  df_data.to_json(date_format='iso', orient='split')
 
-    try:
-        if isinstance(values, str):
-            df = pdr.data.get_data_yahoo(values)
-            plot = timeseries_plot( df )
-        elif isinstance(values, list):
-            data_frames = [pdr.data.get_data_yahoo(value) for value in values]
-            plot = timeseries_plot(data_frames[0] )
-            
-        
-        figure = plot.plot()
-        
-        figure = plot.add_plot(figure, OHLC)
-        
-        
-        
-        
-        figure = dcc.Graph( figure = figure)
+@app.callback(
+        Output('stock-plot', 'children'),
+        [Input('OCLH', 'value'), Input('intermediate-data-value', 'children')]
+        )
+def plot_data(OCLH, jsonified_data):
     
-    except:
-        figure = dcc.Graph()
+    df = pd.read_json(jsonified_data, orient='split')
     
+    graph = timeseries_plot(df)
     
-    return  figure
-
+    figure = graph.plot()
+        
+    figure = graph.add_plot(figure, OCLH)  
+        
+    figure = dcc.Graph( figure = figure)
+        
+    return figure
