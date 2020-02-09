@@ -49,14 +49,14 @@ class timeseries_plot:
         
     
     
-    def bollinger_bands(self, fig, price, window = 20, no_std = 2, center = False):
-        df_rm = self.df.rolling(self.window, center = center).mean()
+    def bollinger_bands(self, fig, price = 'Close', window = 40, no_std = 2, center = False):
+        df_rm = self.df.rolling(window, center = center).mean()
         rolling_std = self.df.rolling(window, center = center ).std()
         
         
         fig = fig.add_trace({'x' : df_rm.index, 'y' : df_rm[price], 'name' : 'mavg'  }, 1,1)
-        fig = fig.add_trace({'x' : df_rm.index, 'y' : df_rm[price]+rolling_std*no_std, 'name' : 'Bb Upper'  }, 1,1)
-        fig = fig.add_trace({'x' : df_rm.index, 'y' : df_rm[price]+rolling_std*no_std, 'name' : 'Bb Lower'  }, 1,1)
+        fig = fig.add_trace({'x' : df_rm.index, 'y' : df_rm[price]+rolling_std[price]*no_std, 'name' : 'Bb Upper'  }, 1,1)
+        fig = fig.add_trace({'x' : df_rm.index, 'y' : df_rm[price]-rolling_std[price]*no_std, 'name' : 'Bb Lower'  }, 1,1)
         
         return fig
         

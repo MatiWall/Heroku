@@ -23,30 +23,28 @@ options_price = [{'label': 'Highest Daily Price', 'value': 'High'}, {'label': 'L
 layout = html.Div([
     html.H3('Long Term Stock Trading'),
     html.Div([
-    html.Div(id = 'content', children = [dcc.Dropdown(
-            id="input-ticker",
-            options = options_ticker,
-            placeholder="Select one or more companies",
-            multi = True,
-            value='TSLA'
-        ), 
-             dcc.Checklist(
-             id='OCLH',
-             options=[{'label': i, 'value': i} for i in ['Close', 'Open', 'High', 'Low', 'Adj Close']],
-             labelStyle={'display': 'inline-block'},  
-             value = ['Close']
-             )  
-    ], className = 'six columns'), html.Br(), html.Br()
-                    ]),
+            html.Div(id = 'content', children = 
+                     [dcc.Dropdown( id="input-ticker",
+                                   options = options_ticker,
+                                   placeholder="Select one or more companies",
+                                   multi = True,
+                                   value='TSLA'
+                                   ), 
+                     dcc.Checklist( id='OCLH',
+                                   options=[{'label': i, 'value': i} for i in ['Close', 'Open', 'High', 'Low', 'Adj Close']],
+                                   labelStyle={'display': 'inline-block'},  
+                                   value = ['Close']
+                                   )  
+                     ], className = 'six columns'), html.Br(), html.Br()
+            ]),
              html.Div(id='intermediate-data-value', style={'display': 'none'}),
              
     html.Br(), html.Div([ 
     html.Div(id = 'stock-plot', className = 'ten columns'),
-    html.Div([  html.H5('Technical Indocators'),
+    html.Div([  html.H5('Technical Indicators'),
     dcc.Checklist(
              id='technical-indicators',
-             options=[{'label': i, 'value': i} for i in ['Bollinger Bands', 'Open', 'High', 'Low', 'Adj Close']],
-             value = ['Close'],
+             options=[{'label': i, 'value': i} for i in ['Bollinger Bands']]
              
              ),
             ])
@@ -63,25 +61,39 @@ def display_value(values):
     df_data = pd.DataFrame()
     for value in is_list(values):
         df = pdr.data.get_data_yahoo(value)
-        df[value] = value
+        df['Ticker'] = value
         df_data = df_data.append(df)
     
     return  df_data.to_json(date_format='iso', orient='split')
 
 @app.callback(
         Output('stock-plot', 'children'),
-        [Input('OCLH', 'value'), Input('intermediate-data-value', 'children')]
+        [Input('OCLH', 'value'), Input('intermediate-data-value', 'children'), Input('technical-indicators', 'value')]
         )
-def plot_data(OCLH, jsonified_data):
+def plot_data(OCLH, jsonified_data, technical_indicators):
     
+     
     df = pd.read_json(jsonified_data, orient='split')
     
-    graph = timeseries_plot(df)
+    gb = df.groupby(['Ticker'])
     
-    figure = graph.plot()
+    
+    plots = []
+    for name, group in gb:
         
-    figure = graph.add_plot(figure, OCLH)  
+        graph = timeseries_plot(group)
+    
+        figure = graph.plot()
         
-    figure = dcc.Graph( figure = figure)
+        figure = graph.add_plot(figure, OCLH)  
         
-    return figure
+        graph = dcc.Graph( figure = figure)
+        plots.append(html.Div(graph))
+        
+   
+    
+    if technical_indicators:
+        figure = graph.bollinger_bands(figure)
+
+    return plots
+
