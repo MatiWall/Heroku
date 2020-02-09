@@ -1,0 +1,12 @@
+To Do
+
+App 1:
+
+- make a pct_change for all chosen ticker
+- see if you can make the checklist for "price" and "technical indicators" individual for each plot
+
+
+App 2:
+
+- Add bar to choose ticker
+- Make plots live

@@ -75,25 +75,27 @@ def plot_data(OCLH, jsonified_data, technical_indicators):
      
     df = pd.read_json(jsonified_data, orient='split')
     
-    gb = df.groupby(['Ticker'])
+    try:
+        gb = df.groupby(['Ticker'])
     
-    
-    plots = []
-    for name, group in gb:
+        plots = []
+        for name, group in gb:
+            
+            plotly_graph = timeseries_plot(group) 
+            figure = plotly_graph.plot() 
+            figure = plotly_graph.add_plot(figure, OCLH)  
+     
+            if technical_indicators:
+                figure = plotly_graph.bollinger_bands(figure)
         
-        graph = timeseries_plot(group)
-    
-        figure = graph.plot()
+            graph = dcc.Graph( figure = figure)
         
-        figure = graph.add_plot(figure, OCLH)  
-        
-        graph = dcc.Graph( figure = figure)
-        plots.append(html.Div(graph))
-        
+            plots.append(html.Div(graph))
+    except:
+        plots =html.H1('No Stock Selected!')
    
     
-    if technical_indicators:
-        figure = graph.bollinger_bands(figure)
+   
 
     return plots
 
