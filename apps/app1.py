@@ -21,10 +21,10 @@ options_price = [{'label': 'Highest Daily Price', 'value': 'High'}, {'label': 'L
 
 
 layout = html.Div([
-    html.H3('Long Term Stock Trading'),
+    html.H3('Investments'),
     html.Div([
             html.Div(id = 'content', children = 
-                     [dcc.Dropdown( id="input-ticker",
+                     [dcc.Dropdown( id="inputCompanyName",
                                    options = options_ticker,
                                    placeholder="Select one or more companies",
                                    multi = True,
@@ -35,7 +35,14 @@ layout = html.Div([
                                    labelStyle={'display': 'inline-block'},  
                                    value = ['Close']
                                    )  
-                     ], className = 'six columns'), html.Br(), html.Br()
+                     , 
+             dcc.Input(
+            id ='inputCompanyTicker',
+            type = 'text',
+            debounce = True, 
+            multiple = True,
+            placeholder = 'Input Ticker',
+        )   ], className = 'six columns'), html.Br(), html.Br()
             ]),
              html.Div(id='intermediate-data-value', style={'display': 'none'}),
              
@@ -56,21 +63,42 @@ layout = html.Div([
 
 @app.callback(# Callback that loads chosen data
     Output('intermediate-data-value', 'children'),
-    [Input('input-ticker', 'value')])
-def display_value(values):
-    df_data = pd.DataFrame()
-    for value in is_list(values):
-        df = pdr.data.get_data_yahoo(value)
-        df['Ticker'] = value
-        df_data = df_data.append(df)
+    [Input('inputCompanyName', 'value'), Input('inputCompanyTicker', 'value')])
+def display_value(dropDownTickers, inputTickers ):
     
+    
+    if dropDownTickers is None and inputTickers is None:
+    
+        return None
+    elif dropDownTickers is None:
+        tickers = is_list(inputTickers)
+    elif inputTickers is None:
+        tickers = is_list(dropDownTickers)
+    else:
+        tickers = is_list(inputTickers) + is_list(dropDownTickers)
+    
+  
+        
+
+    df_data = pd.DataFrame()
+    for value in tickers:
+        try:
+            df = pdr.data.get_data_yahoo(value)
+            df['Ticker'] = value
+            df_data = df_data.append(df)
+        except:
+            print('Invalid ticker {}'.format(value))
+        
     return  df_data.to_json(date_format='iso', orient='split')
+
 
 @app.callback(
         Output('stock-plot', 'children'),
         [Input('OCLH', 'value'), Input('intermediate-data-value', 'children'), Input('technical-indicators', 'value')]
         )
 def plot_data(OCLH, jsonified_data, technical_indicators):
+    
+    
     
      
     df = pd.read_json(jsonified_data, orient='split')

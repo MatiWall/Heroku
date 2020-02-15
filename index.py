@@ -25,8 +25,8 @@ navigation_style = {'backgroundColor':'dodgerblue', 'border-radius': 5 , 'margin
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(html.Nav([	html.A('K&M Investments',  style = logo_style), html.A(dcc.Link('Home', href='/', style = navigation_buttom_style), className = 'button', style = {'marginLeft': 30,}), 
-    		  	html.A( dcc.Link('Stock', href='/apps/app1', style = navigation_buttom_style), className = 'button'), 
-    		  	html.A( dcc.Link('Intraday', href='/apps/app2', style = navigation_buttom_style), className = 'button')], style = navigation_style)),
+    		  	html.A( dcc.Link('Investment', href='/apps/app1', style = navigation_buttom_style), className = 'button'), 
+    		  	html.A( dcc.Link('Trading', href='/apps/app2', style = navigation_buttom_style), className = 'button')], style = navigation_style)),
     		  	
     html.Div(id='page-content')
 ])

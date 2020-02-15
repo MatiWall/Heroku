@@ -22,7 +22,7 @@ figure = plot.candlestick()
 
 
 layout = html.Div([
-    html.H3('App 2'),
+    html.H3('Intraday Trading'),
     dcc.Graph(figure = figure),
     dcc.Dropdown(
         id='app-2-dropdown',
