@@ -10,3 +10,7 @@ App 2:
 
 - Add bar to choose ticker
 - Make plots live
+
+
+Usefull links:
+- https://docs.anychart.com/Stock_Charts/Technical_Indicators/Mathematical_Description
