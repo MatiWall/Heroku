@@ -1,16 +1,15 @@
 import pandas as pd
-
-import plotly.figure_factory as ff
-from datetime import datetime, timedelta 
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import cufflinks as cf
 
 class monte_carlo:
     
     
-    def __init__(self, df, start, end):
+    def __init__(self, df):
         
         self.df = df
-        self.start = start
-        self.end = end
         
         
     def GBM(self, simulations = 100, forcast_steps = 50, dt=1):
@@ -27,7 +26,6 @@ class monte_carlo:
         daily_std = returns.std()
         daily_mean = returns.mean()
         
-        forcast_steps = int(np.ceil(self.forecast_days/dt))
 
         df_simulations = pd.DataFrame( index = [ last_date + pd.Timedelta(days=dt*x) for x in range(forcast_steps)])
     
@@ -49,12 +47,17 @@ class monte_carlo:
         self.df_simulations = df_simulations
         
        
-       
-	def plot(self):
-	
-		fig = ff.create_distplot(self.df_simulations)
 		
-		
-		return fig
-		
-	
+    def plot_simulation(self):
+      
+        #fig = make_subplots(rows=2, cols=2, shared_xaxes = False, vertical_spacing=0.03,horizontal_spacing=0.009)
+        
+        plot = self.df_simulations.iplot(kind='scatter')
+        print(type(plot))
+        
+        pass
+    
+    def return_data(self):
+        return self.df_simulations
+    
+    

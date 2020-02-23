@@ -5,6 +5,7 @@ from dash.dependencies import Input, Output
 from app import app
 
 from .plots import timeseries_plot, is_list
+from .simulations import monte_carlo
 
 import pandas_datareader as pdr
 import pandas as pd
@@ -56,8 +57,18 @@ layout = html.Div([
              ),
             ])
     
-    ])  ,
+    ])
+    , html.Br(),
+    html.Div([
+            dcc.Checklist( id='montecarlo',
+                                   options=[{'label': 1, 'value': 0}],
+                                   labelStyle={'display': 'inline-block'},  
+                                   )  ,
+            
+            html.Div(id = 'montecarloPlot', className = 'ten columns'),]),
     dcc.Link('Go to App 2', href='/apps/app2')
+    
+    
 ])
 
 
@@ -99,7 +110,6 @@ def display_value(dropDownTickers, inputTickers ):
 def plot_data(OCLH, jsonified_data, technical_indicators):
     
     
-    
      
     df = pd.read_json(jsonified_data, orient='split')
     
@@ -126,4 +136,20 @@ def plot_data(OCLH, jsonified_data, technical_indicators):
    
 
     return plots
+
+
+
+@app.callback(
+        Output('montecarloPlot', 'children'),
+        [Input('montecarlo', 'value'), Input('intermediate-data-value', 'children')]
+        )
+def plot_montecarlo(value, jsonified_data):
+     
+    df = pd.read_json(jsonified_data, orient='split')
+
+    mtSim = monte_carlo(df['Close'])
+    mtSim.GBM()
+    fig = mtSim.plot_simulation()
+    print(type(fig))
+    return fig
 
