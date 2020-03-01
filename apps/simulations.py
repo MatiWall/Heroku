@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import cufflinks as cf
 
 class monte_carlo:
     
@@ -12,7 +11,7 @@ class monte_carlo:
         self.df = df
         
         
-    def GBM(self, simulations = 100, forcast_steps = 50, dt=1):
+    def GBM(self, simulations = 500, forcast_steps = 50, dt=1):
         ''' 
         GBM: Geometric Brownian Motion.
         '''
@@ -50,12 +49,47 @@ class monte_carlo:
 		
     def plot_simulation(self):
       
-        #fig = make_subplots(rows=2, cols=2, shared_xaxes = False, vertical_spacing=0.03,horizontal_spacing=0.009)
+        fig = make_subplots(rows=1, cols=2, shared_xaxes = False, vertical_spacing=0.03,horizontal_spacing=0.009)
         
-        plot = self.df_simulations.iplot(kind='scatter')
-        print(type(plot))
+        for name, data in self.df_simulations.iteritems():
+            fig.add_trace({'x': data.index,'y': data.values,'type':'scatter', 'showlegend' : False},
+                         row = 1, col = 1, secondary_y=False)
+            if name > 200:
+                break
+            
+            
+        df_simulations_end = self.df_simulations.iloc[-1, :]  
+
+        fig.add_trace({'x':  df_simulations_end.values, 'type':'histogram', 'showlegend' : False,  'xbins' : {'size' : 25},  'histnorm' : "probability", },
+                         row = 1, col = 2, secondary_y=False)
         
-        pass
+        
+        #self.kde()
+        
+        return fig
+    
+    
+    def kde(self, h = 1, kernel = 'gaussian'):
+        
+        data = self.df_simulations.iloc[-1,:].to_numpy()
+        
+        if kernel == 'gaussian':
+            K = lambda x : np.sum(np.exp(-(np.subtract(x,data.transpose()))**2/h))
+        else:
+            print('Choose Kernel')
+    
+        range_min = data.min()
+        range_max = data.max()
+        
+        range_data = np.linspace(range_min, range_max, 100)
+        
+        kde_dist = K(range_data)
+        
+        print(kde_dist)
+        return kde_dist
+
+    
+    
     
     def return_data(self):
         return self.df_simulations

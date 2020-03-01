@@ -150,6 +150,7 @@ def plot_montecarlo(value, jsonified_data):
     mtSim = monte_carlo(df['Close'])
     mtSim.GBM()
     fig = mtSim.plot_simulation()
-    print(type(fig))
-    return fig
+    
+    graph = dcc.Graph( figure = fig)
+    return graph
 
